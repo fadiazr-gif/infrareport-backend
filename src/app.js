@@ -10,7 +10,9 @@ const activosRoutes = require('./routes/activos.routes');
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_ORIGIN || '*'
+}));
 app.use(express.json());
 
 // Ruta principal
@@ -60,10 +62,10 @@ const PORT = process.env.PORT || 3000;
 // Inicializar base de datos
 initDb()
     .then(() => {
-        app.listen(PORT, () => {
+        const server = app.listen(PORT, () => {
             console.log('--------------------------------');
             console.log('INFRAREPORT - BACKEND');
-            console.log(`Servidor: http://localhost:${PORT}`);
+            console.log(`Servidor: http://localhost:${server.address().port}`);
             console.log('Base de datos: SQLite');
             console.log('API: /api/activos');
             console.log('--------------------------------');
