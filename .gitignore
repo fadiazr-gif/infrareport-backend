@@ -4,3 +4,8 @@ data/*.db
 data/*.db-journal
 data/*.db-shm
 data/*.db-wal
+app.db
+app.db-journal
+app.db-shm
+app.db-wal
+dist/

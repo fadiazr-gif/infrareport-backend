@@ -15,6 +15,7 @@ con inventarios, hallazgos, riesgos y recomendaciones.
 - Express
 - SQLite
 - JavaScript
+- Vite
 - API REST
 - Git y GitHub
 
@@ -44,12 +45,8 @@ Campos:
 - Fecha de creación
 
 ### Instalación
-1. Clonar el repositorio.
-2. Ejecutar npm install.
-3. Copiar .env.example a .env.
-4. Ejecutar npm run dev.
 
-Servidor: http://localhost:3000
+Consulta [Ejecución local](#ejecución-local) para iniciar ambos servicios.
 
 ### Endpoints
 
@@ -96,75 +93,57 @@ obligatorios y los valores permitidos.
 
 ## Actividad 11 · Integración de frontend y API
 
-El inventario web usa HTML, CSS y JavaScript. Se sirve en un proceso independiente en el puerto 5173. El navegador consume la API de Express en el puerto 3000 mediante `fetch`. SQLite y las validaciones de negocio siguen en el backend.
+### Ejecución local
 
-### 1. Preparar el entorno
+Necesitas Git y Node.js 22.12 o posterior en la serie 22, o Node.js 24 o posterior. La actividad se publica en la rama `actividad-11-frontend` de este repositorio.
 
-Desde la raíz del repositorio, en PowerShell:
-
-```powershell
-npm.cmd ci
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-```
-
-Conserva el valor existente de `DB_FILE` si ya tienes una base de datos con activos. Si clonaste el repositorio en otra carpeta, configura `DB_FILE` con la ruta de tu base existente antes de iniciar el backend.
-
-Si `npm.cmd ci` devuelve `ENOENT` al crear `node_modules` en OneDrive, clona la rama en una carpeta local fuera de OneDrive, como `C:\dev\infrareport`, y vuelve a ejecutar este paso.
-
-### 2. Levantar la API y configurar CORS
-
-Agrega `FRONTEND_ORIGIN=http://localhost:5173` a `.env` para autorizar ese origen. Si la variable se omite, la API conserva su comportamiento anterior y permite cualquier origen. El origen incluye esquema, host y puerto. Usa `localhost` en ambos pasos.
-
-```powershell
-npm.cmd start
-```
-
-Abre http://localhost:3000/api/activos y confirma que aparece una lista JSON. Una base nueva devuelve `[]`.
-
-### 3. Abrir el frontend
-
-En otra terminal, desde la misma carpeta:
-
-```powershell
-npm.cmd run frontend
-```
-
-Abre http://localhost:5173. Si tu API usa otro puerto, define por ejemplo `$env:API_URL = 'http://localhost:3001/api/activos'` en la terminal del frontend antes de iniciarlo. Si cambias el puerto del frontend mediante `FRONTEND_PORT`, actualiza también `FRONTEND_ORIGIN` en el backend y reinícialo.
-
-### 4. Probar con un activo de demostración
-
-| Paso | Resultado esperado |
-|---|---|
-| Abrir la página o pulsar **Actualizar lista** | GET 200 y tabla de inventario |
-| Intentar guardar con un campo requerido vacío o solo con espacios | El formulario indica qué falta y bloquea el envío |
-| Escribir una IP inválida como `300.1.2.3` | El formulario solicita una IPv4 o IPv6 válida antes de enviar |
-| Registrar un activo de prueba con empresa, nombre, tipo, estado y criticidad | POST 201 y fila nueva |
-| Pulsar **Ver** en la fila nueva | GET 200 y detalle completo |
-| Pulsar **Editar**, cambiar el estado y guardar | PUT 200 y cambio visible |
-| Pulsar **Eliminar** y cancelar la confirmación | El activo permanece en la tabla |
-| Confirmar **Eliminar** para ese activo de prueba | DELETE 204 sin cuerpo y fila eliminada |
-| Detener la API y pulsar **Actualizar lista** | Mensaje de conexión en pantalla |
-
-El frontend muestra los mensajes de error que devuelve la API, incluidos HTTP 400 y 404. Para verificar esos casos, probar el CRUD y comprobar la solicitud previa de CORS, ejecuta:
-
-```powershell
-npm.cmd test
-```
-
-Las pruebas usan una base SQLite temporal. Se verificó el ciclo completo en Edge con datos de demostración y se consultó la API después de crear, actualizar y eliminar para comprobar el estado guardado en SQLite.
-
-- [Validación de una IP incorrecta](evidencias/frontend-validacion.png)
-- [Creación y listado del activo](evidencias/frontend-creacion.png)
-- [Actualización del estado](evidencias/frontend-edicion.png)
-- [Eliminación del activo](evidencias/frontend-eliminacion.png)
-
-### 5. Publicar el avance
-
-La entrega usa la rama `actividad-11-frontend` del mismo repositorio. Puedes obtenerla en una carpeta nueva con:
+Si todavía no tienes el proyecto, clona la rama. Si ya lo tienes, ejecuta los pasos siguientes en la raíz de tu copia de la rama.
 
 ```powershell
 git clone --branch actividad-11-frontend https://github.com/fadiazr-gif/infrareport-backend.git
 cd infrareport-backend
 ```
 
-Si haces cambios, revisa `git status --short`, crea un commit y ejecuta `git push origin actividad-11-frontend`. Revisa la rama en GitHub antes de integrarla a `main`. La configuración `.env` y las bases SQLite en `data/` están excluidas por `.gitignore`.
+Instala las dependencias del backend y del frontend. Copia la configuración de ejemplo si todavía no existe un archivo `.env`.
+
+```powershell
+npm.cmd ci
+npm.cmd --prefix frontend ci
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+La configuración de ejemplo usa el puerto 3000, guarda los datos en `data/app.db` y autoriza el origen `http://localhost:5173`. Si ya tienes una base de datos en uso, conserva el valor de `DB_FILE` en tu configuración. Si OneDrive impide instalar las dependencias, usa una copia en una carpeta local fuera de OneDrive.
+
+Abre dos terminales en la raíz del repositorio y mantenlas abiertas al mismo tiempo.
+
+| Terminal | Comando | Dirección |
+|---|---|---|
+| Backend Express y SQLite | `npm.cmd start` | [API de activos](http://localhost:3000/api/activos) |
+| Frontend Vite | `npm.cmd run frontend` | [InfraReport](http://localhost:5173) |
+
+Usa `localhost` en el navegador para que coincida con `FRONTEND_ORIGIN`. Si la API usa otro puerto, define primero `$env:VITE_API_URL = 'http://localhost:3001/api/activos'` en la terminal del frontend. Si Vite usa otro puerto, ajusta `FRONTEND_ORIGIN` y reinicia el backend.
+
+### Verificar el CRUD y los errores en el navegador
+
+Abre InfraReport y, en las herramientas de desarrollador, usa la pestaña **Red** para comprobar el método y el estado HTTP. Usa un activo de demostración para las pruebas de edición y eliminación.
+
+| Prueba | Pasos en la interfaz | Resultado esperado |
+|---|---|---|
+| GET 200 | Abre la página o pulsa **Actualizar activos**. | Se muestra el inventario. |
+| POST 400 | Introduce una empresa de prueba y escribe solo espacios en **Nombre del activo**. Selecciona tipo, estado y criticidad. Pulsa **Guardar activo tecnológico**. | Aparece **HTTP 400: El campo nombre es obligatorio**. La API recibe el nombre como una cadena vacía tras recortar los espacios. El inventario conserva sus registros. |
+| POST 201 | Corrige el nombre, por ejemplo a **Switch de demostración**, y vuelve a guardar. | Aparece un mensaje de creación y se agrega la fila. |
+| PUT 200 | Pulsa **Editar** sobre el activo de prueba, cambia su estado y guarda. | Se muestra el estado actualizado. |
+| DELETE 204 y PUT 404 | Abre el inventario en dos pestañas. En la segunda, pulsa **Editar** sobre el activo de prueba. En la primera, elimínalo y confirma. Regresa a la segunda y guarda la edición pendiente. | La eliminación devuelve **204**. La edición pendiente muestra **HTTP 404: Activo tecnológico no encontrado**. Pulsa **Cancelar edición** y luego **Actualizar activos** para sincronizar el inventario. |
+
+Una IP inválida, como `300.1.2.3`, se rechaza en el formulario antes de enviar una solicitud. La prueba del nombre con espacios permite comprobar una respuesta **400** real del backend.
+
+Las pruebas de integración de la API se ejecutan con `npm.cmd test` y usan una base SQLite temporal. La compilación del frontend se comprueba con `npm.cmd --prefix frontend run build`.
+
+### Evidencias de la Actividad 11
+
+Las capturas se tomaron en Edge con un inventario temporal y datos de demostración.
+
+- [HTTP 400 en el formulario de registro](evidencias/actividad-11/frontend-http-400.png)
+- [HTTP 404 al guardar una edición pendiente](evidencias/actividad-11/frontend-http-404.png)
+
+La configuración local `.env` y la base `app.db` están excluidas por `.gitignore`. El repositorio incluye `.env.example` para preparar una instalación nueva.
