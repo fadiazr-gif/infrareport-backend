@@ -91,16 +91,16 @@ obligatorios y los valores permitidos.
 - Matriz de riesgos.
 - Generación de informes PDF.
 
-## Actividad 11 · Integración de frontend y API
+## Integración de frontend y API
 
 ### Ejecución local
 
-Necesitas Git y Node.js 22.12 o posterior en la serie 22, o Node.js 24 o posterior. La actividad se publica en la rama `actividad-11-frontend` de este repositorio.
+Necesitas Git y Node.js 22.12 o posterior en la serie 22, o Node.js 24 o posterior.
 
-Si todavía no tienes el proyecto, clona la rama. Si ya lo tienes, ejecuta los pasos siguientes en la raíz de tu copia de la rama.
+Si todavía no tienes el proyecto, clona el repositorio. Si ya lo tienes, ejecuta los pasos siguientes en la raíz de tu copia local.
 
 ```powershell
-git clone --branch actividad-11-frontend https://github.com/fadiazr-gif/infrareport-backend.git
+git clone https://github.com/fadiazr-gif/infrareport-backend.git
 cd infrareport-backend
 ```
 
@@ -139,7 +139,7 @@ Una IP inválida, como `300.1.2.3`, se rechaza en el formulario antes de enviar 
 
 Las pruebas de integración de la API se ejecutan con `npm.cmd test` y usan una base SQLite temporal. La compilación del frontend se comprueba con `npm.cmd --prefix frontend run build`.
 
-### Evidencias de la Actividad 11
+### Evidencias de las pruebas en el navegador
 
 Las capturas se tomaron en Edge con un inventario temporal y datos de demostración.
 
